@@ -1,3 +1,5 @@
+import { customerInteractionApi } from "../../services/api/customerInteractionsApi";
+import { ticketApi } from "../../services/api/ticketApi";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
@@ -6,6 +8,15 @@ import { formatDateTimeTR } from "../../utils/date";
 function CustomerDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const [editingInteractionId, setEditingInteractionId] = useState(null);
+  const [editingInteractionText, setEditingInteractionText] = useState("");
+
+
+  const [tickets, setTickets] = useState([]);
+
+  const [interactions, setInteractions] = useState([]);
+  const [interactionText, setInteractionText] = useState("");
 
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,6 +36,48 @@ function CustomerDetailPage() {
     notes: "",
     isPrimary: false,
   });
+  const startEditInteraction = (interaction) => {
+  setEditingInteractionId(interaction.id);
+  setEditingInteractionText(interaction.description ?? "");
+};
+
+const cancelEditInteraction = () => {
+  setEditingInteractionId(null);
+  setEditingInteractionText("");
+};
+
+const handleUpdateInteraction = async (interaction) => {
+  if (!editingInteractionText.trim()) return;
+
+  try {
+    await customerInteractionApi.update(interaction.id, {
+      title: interaction.title || "Görüşme Notu",
+      description: editingInteractionText.trim(),
+      interactionType: interaction.interactionType || "Note",
+      interactionDate: interaction.interactionDate,
+    });
+
+    setEditingInteractionId(null);
+    setEditingInteractionText("");
+    await fetchInteractions();
+  } catch (err) {
+    console.error("Interaction güncellenemedi:", err);
+    alert("Görüşme notu güncellenemedi.");
+  }
+};
+
+const handleDeleteInteraction = async (id) => {
+  if (!window.confirm("Bu görüşme notu silinsin mi?")) return;
+
+  try {
+    await customerInteractionApi.delete(id);
+    await fetchInteractions();
+  } catch (err) {
+    console.error("Interaction silinemedi:", err);
+    alert("Görüşme notu silinemedi.");
+  }
+};
+
 
   const [showEditContactModal, setShowEditContactModal] = useState(false);
   const [contactUpdating, setContactUpdating] = useState(false);
@@ -103,6 +156,23 @@ function CustomerDetailPage() {
       setLoading(false);
     }
   };
+  const fetchTickets = async () => {
+  try {
+    const data = await ticketApi.getByCustomer(id);
+    setTickets(data);
+  } catch (err) {
+    console.error("Ticketlar alınamadı", err);
+  }
+};
+const fetchInteractions = async () => {
+  try {
+    const data = await customerInteractionApi.getByCustomer(id);
+    setInteractions(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error("Interactions alınamadı:", err);
+    setInteractions([]);
+  }
+};
 
   const fetchContacts = async () => {
   try {
@@ -135,8 +205,25 @@ function CustomerDetailPage() {
     }
   }
 };
+const handleAddInteraction = async () => {
+  if (!interactionText.trim()) return;
 
-  
+  try {
+    await customerInteractionApi.create({
+      customerId: Number(id),
+      title: "Görüşme Notu",
+      description: interactionText.trim(),
+      interactionType: "Note",
+      interactionDate: new Date().toISOString(),
+    });
+
+    setInteractionText("");
+    await fetchInteractions();
+  } catch (err) {
+    console.error("Interaction eklenemedi:", err);
+    alert("Görüşme notu eklenemedi.");
+  }
+};
 
   const handleDeleteContact = async (contactId) => {
     const confirmDelete = window.confirm(
@@ -169,6 +256,8 @@ function CustomerDetailPage() {
   useEffect(() => {
     fetchCustomer();
     fetchContacts();
+    fetchTickets();
+    fetchInteractions();
   }, [id]);
 
   useEffect(() => {
@@ -342,183 +431,311 @@ const handleCreateContact = async (e) => {
   }
 
   return (
-    <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-0">Customer Detail</h2>
+  <div>
+    <div className="d-flex justify-content-between align-items-center mb-3">
+      <h2 className="mb-0">Customer Detail</h2>
 
-        <div className="d-flex gap-2">
-          <button
-            className="btn btn-warning"
-            onClick={() => setShowEditModal(true)}
-          >
-            Düzenle
-          </button>
+      <div className="d-flex gap-2">
+        <button
+          className="btn btn-warning"
+          onClick={() => setShowEditModal(true)}
+        >
+          Düzenle
+        </button>
 
-          <button
-            className="btn btn-secondary"
-            onClick={() => navigate("/customers")}
-          >
-            Geri
-          </button>
-        </div>
+        <button
+          className="btn btn-secondary"
+          onClick={() => navigate("/customers")}
+        >
+          Geri
+        </button>
       </div>
+    </div>
 
-      <div className="card">
-        <div className="card-body">
-          <div className="row g-3">
-            <div className="col-md-6">
-              <strong>ID</strong>
-              <div>{customer.id}</div>
-            </div>
+    {/* Customer Info */}
+    <div className="card">
+      <div className="card-body">
+        <div className="row g-3">
+          <div className="col-md-6">
+            <strong>ID</strong>
+            <div>{customer.id}</div>
+          </div>
 
-            <div className="col-md-6">
-              <strong>Company Name</strong>
-              <div>{customer.companyName ?? "-"}</div>
-            </div>
+          <div className="col-md-6">
+            <strong>Company Name</strong>
+            <div>{customer.companyName ?? "-"}</div>
+          </div>
 
-            <div className="col-md-6">
-              <strong>Contact Name</strong>
-              <div>{customer.contactName ?? "-"}</div>
-            </div>
+          <div className="col-md-6">
+            <strong>Contact Name</strong>
+            <div>{customer.contactName ?? "-"}</div>
+          </div>
 
-            <div className="col-md-6">
-              <strong>Email</strong>
-              <div>{customer.email ?? "-"}</div>
-            </div>
+          <div className="col-md-6">
+            <strong>Email</strong>
+            <div>{customer.email ?? "-"}</div>
+          </div>
 
-            <div className="col-md-6">
-              <strong>Phone</strong>
-              <div>{customer.phone ?? "-"}</div>
-            </div>
+          <div className="col-md-6">
+            <strong>Phone</strong>
+            <div>{customer.phone ?? "-"}</div>
+          </div>
 
-            <div className="col-md-6">
-              <strong>City</strong>
-              <div>{customer.city ?? "-"}</div>
-            </div>
+          <div className="col-md-6">
+            <strong>City</strong>
+            <div>{customer.city ?? "-"}</div>
+          </div>
 
-            <div className="col-md-12">
-              <strong>Address</strong>
-              <div>{customer.address ?? "-"}</div>
-            </div>
+          <div className="col-md-12">
+            <strong>Address</strong>
+            <div>{customer.address ?? "-"}</div>
+          </div>
 
-            <div className="col-md-12">
-              <strong>Notes</strong>
-              <div>{customer.notes ?? "-"}</div>
-            </div>
+          <div className="col-md-12">
+            <strong>Notes</strong>
+            <div>{customer.notes ?? "-"}</div>
+          </div>
 
-            <div className="col-md-6">
-              <strong>Is Active</strong>
-              <div>{customer.isActive ? "Yes" : "No"}</div>
-            </div>
+          <div className="col-md-6">
+            <strong>Is Active</strong>
+            <div>{customer.isActive ? "Yes" : "No"}</div>
+          </div>
 
-            <div className="col-md-6">
-              <strong>Created At</strong>
-              <div>{formatDateTimeTR(customer.createdAt)}</div>
-            </div>
+          <div className="col-md-6">
+            <strong>Created At</strong>
+            <div>{formatDateTimeTR(customer.createdAt)}</div>
+          </div>
 
-            <div className="col-md-6">
-              <strong>Updated At</strong>
-              <div>{formatDateTimeTR(customer.updatedAt)}</div>
-            </div>
+          <div className="col-md-6">
+            <strong>Updated At</strong>
+            <div>{formatDateTimeTR(customer.updatedAt)}</div>
           </div>
         </div>
       </div>
+    </div>
 
-      <div className="card mt-4">
-        <div className="card-body">
-          <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <h5 className="mb-0">Contacts ({filteredContacts.length})</h5>
+    {/* Contacts */}
+    <div className="card mt-4">
+      <div className="card-body">
+        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <h5 className="mb-0">Contacts ({filteredContacts.length})</h5>
 
-            <div className="d-flex gap-2">
-              <input
-                type="text"
-                className="form-control form-control-sm"
-                placeholder="Contact ara..."
-                value={contactSearch}
-                onChange={(e) => setContactSearch(e.target.value)}
-                style={{ width: "220px" }}
-              />
+          <div className="d-flex gap-2">
+            <input
+              type="text"
+              className="form-control form-control-sm"
+              placeholder="Contact ara..."
+              value={contactSearch}
+              onChange={(e) => setContactSearch(e.target.value)}
+              style={{ width: "220px" }}
+            />
 
-              <button
-                type="button"
-                className="btn btn-sm btn-primary"
-                onClick={() => setShowContactModal(true)}
-              >
-                Yeni Contact
-              </button>
-            </div>
+            <button
+              type="button"
+              className="btn btn-sm btn-primary"
+              onClick={() => setShowContactModal(true)}
+            >
+              Yeni Contact
+            </button>
           </div>
+        </div>
 
-          {filteredContacts.length === 0 ? (
-            <p className="text-muted mb-0">
-              {contactSearch.trim()
-                ? "Aramaya uygun contact bulunamadı."
-                : "Contact bulunamadı."}
-            </p>
-          ) : (
-            <div className="table-responsive">
-              <table className="table table-sm align-middle">
-                <thead>
-                  <tr>
-                    <th>Full Name</th>
-                    <th>Title</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Primary</th>
-                    <th>Actions</th>
+        {filteredContacts.length === 0 ? (
+          <p className="text-muted mb-0">
+            {contactSearch.trim()
+              ? "Aramaya uygun contact bulunamadı."
+              : "Contact bulunamadı."}
+          </p>
+        ) : (
+          <div className="table-responsive">
+            <table className="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>Full Name</th>
+                  <th>Title</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Primary</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredContacts.map((c) => (
+                  <tr key={c.id} className={c.isPrimary ? "table-success" : ""}>
+                    <td>{c.fullName ?? "-"}</td>
+                    <td>{c.title ?? "-"}</td>
+                    <td>
+                      {c.email ? <a href={`mailto:${c.email}`}>{c.email}</a> : "-"}
+                    </td>
+                    <td>{c?.phone || c?.mobilePhone || "-"}</td>
+                    <td>
+                      {c.isPrimary ? (
+                        <span className="badge bg-success">Primary</span>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                    <td>
+                      <div className="d-flex gap-2">
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={() => openEditContactModal(c)}
+                        >
+                          Düzenle
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => handleDeleteContact(c.id)}
+                        >
+                          Sil
+                        </button>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-
-                <tbody>
-                  {filteredContacts.map((c) => (
-                    <tr
-                      key={c.id}
-                      className={c.isPrimary ? "table-success" : ""}
-                    >
-                      <td>{c.fullName ?? "-"}</td>
-                      <td>{c.title ?? "-"}</td>
-                      <td>
-                        {c.email ? (
-                          <a href={`mailto:${c.email}`}>{c.email}</a>
-                        ) : (
-                          "-"
-                        )}
-                      </td>
-                      <td>{c?.phone || c?.mobilePhone || "-"}</td>
-                      <td>
-                        {c.isPrimary ? (
-                          <span className="badge bg-success">Primary</span>
-                        ) : (
-                          "-"
-                        )}
-                      </td>
-                      <td>
-                        <div className="d-flex gap-2">
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-outline-primary"
-                            onClick={() => openEditContactModal(c)}
-                          >
-                            Düzenle
-                          </button>
-
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-outline-danger"
-                            onClick={() => handleDeleteContact(c.id)}
-                          >
-                            Sil
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
+    </div>
+
+    {/* Customer Interactions */}
+    {/* Customer Interactions */}
+<div className="card mt-4">
+  <div className="card-header">
+    <strong>Müşteri Görüşmeleri</strong>
+  </div>
+
+  <div className="card-body">
+    <div className="d-flex gap-2 mb-3">
+      <input
+        className="form-control"
+        placeholder="Not ekle..."
+        value={interactionText}
+        onChange={(e) => setInteractionText(e.target.value)}
+      />
+
+      <button className="btn btn-primary" onClick={handleAddInteraction}>
+        Ekle
+      </button>
+    </div>
+
+    {interactions.length === 0 ? (
+      <p className="text-muted mb-0">Henüz görüşme kaydı yok.</p>
+    ) : (
+      <ul className="list-group">
+        {interactions.map((i) => (
+          <li key={i.id} className="list-group-item">
+            <div className="d-flex justify-content-between align-items-start gap-3">
+              <div className="flex-grow-1">
+                <div className="d-flex justify-content-between">
+                  <strong>{i.title}</strong>
+                  <small className="text-muted">
+                    {formatDateTimeTR(i.interactionDate)}
+                  </small>
+                </div>
+
+                {editingInteractionId === i.id ? (
+                  <div className="mt-2">
+                    <input
+                      className="form-control form-control-sm mb-2"
+                      value={editingInteractionText}
+                      onChange={(e) =>
+                        setEditingInteractionText(e.target.value)
+                      }
+                    />
+
+                    <div className="d-flex gap-2">
+                      <button
+                        className="btn btn-sm btn-primary"
+                        onClick={() => handleUpdateInteraction(i)}
+                      >
+                        Kaydet
+                      </button>
+
+                      <button
+                        className="btn btn-sm btn-secondary"
+                        onClick={cancelEditInteraction}
+                      >
+                        İptal
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-1">{i.description}</div>
+                )}
+              </div>
+
+              {editingInteractionId !== i.id && (
+                <div className="d-flex gap-2">
+                  <button
+                    className="btn btn-sm btn-outline-primary"
+                    onClick={() => startEditInteraction(i)}
+                  >
+                    Düzenle
+                  </button>
+
+                  <button
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={() => handleDeleteInteraction(i.id)}
+                  >
+                    Sil
+                  </button>
+                </div>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</div>
+
+{/* Customer Tickets */}
+<div className="card mt-4">
+  <div className="card-header">
+    <strong>Bu Müşteriye Ait Ticketlar</strong>
+  </div>
+
+  <div className="card-body p-0">
+    <table className="table table-bordered mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Başlık</th>
+          <th>Durum</th>
+          <th>Öncelik</th>
+          <th>Tarih</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {tickets.length === 0 ? (
+          <tr>
+            <td colSpan="5" className="text-center text-muted py-3">
+              Bu müşteriye ait ticket bulunamadı.
+            </td>
+          </tr>
+        ) : (
+          tickets.map((t) => (
+            <tr key={t.id}>
+              <td>{t.id}</td>
+              <td>{t.title}</td>
+              <td>{t.status}</td>
+              <td>{t.priority}</td>
+              <td>{formatDateTimeTR(t.createdAt)}</td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+</div>
 
       {showEditModal && (
         <div
@@ -872,6 +1089,7 @@ const handleCreateContact = async (e) => {
         </div>
       )}
     </div>
+  
   );
 }
 

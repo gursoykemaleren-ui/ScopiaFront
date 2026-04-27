@@ -1,3 +1,4 @@
+import { ticketApi } from "../services/api/ticketApi";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { formatDateTimeTR, formatDateTR } from "../utils/date";
@@ -43,6 +44,16 @@ function DashboardPage() {
     medium: 0,
     low: 0,
   });
+
+  const [ticketSummary, setTicketSummary] = useState({
+  total: 0,
+  open: 0,
+  inProgress: 0,
+  resolved: 0,
+  closed: 0,
+  critical: 0,
+  latestTickets: [],
+});
 
   const [jobsPerCustomer, setJobsPerCustomer] = useState([]);
   const [recentJobs, setRecentJobs] = useState([]);
@@ -125,6 +136,7 @@ function DashboardPage() {
           customerRes,
           recentJobsRes,
           recentActivitiesRes,
+          ticketSummaryRes,
         ] = await Promise.all([
           axios.get("http://localhost:5002/api/dashboard", config),
           axios.get("http://localhost:5002/api/dashboard/unassigned", config),
@@ -133,6 +145,7 @@ function DashboardPage() {
           axios.get("http://localhost:5002/api/dashboard/jobs-per-customer", config),
           axios.get("http://localhost:5002/api/dashboard/recent-jobs", config),
           axios.get("http://localhost:5002/api/dashboard/recent-activities", config),
+          ticketApi.getSummary(),
         ]);
 
         const summaryData = summaryRes.data ?? {};
@@ -144,6 +157,17 @@ function DashboardPage() {
         const recentActivitiesResult = Array.isArray(recentActivitiesRes.data)
           ? recentActivitiesRes.data
           : [];
+          const ticketSummaryData = ticketSummaryRes ?? {};
+
+setTicketSummary({
+  total: ticketSummaryData.total ?? 0,
+  open: ticketSummaryData.open ?? 0,
+  inProgress: ticketSummaryData.inProgress ?? 0,
+  resolved: ticketSummaryData.resolved ?? 0,
+  closed: ticketSummaryData.closed ?? 0,
+  critical: ticketSummaryData.critical ?? 0,
+  latestTickets: ticketSummaryData.latestTickets ?? [],
+});
 
         setSummary({
           totalJobs: summaryData.totalJobs ?? 0,
@@ -202,7 +226,7 @@ function DashboardPage() {
       title: "Overdue Jobs",
       value: summary.overdueJobs,
       icon: "⏰",
-      sub: "Tamamlama Tarihi Geçmiş İşler",
+      sub: "Tamamlama Zamanı Geçmiş İşler",
       border: "danger",
     },
     {
@@ -219,6 +243,27 @@ function DashboardPage() {
       sub: "Bana Atanmış İşler",
       border: "dark",
     },
+   {
+  title: "Total Tickets",
+  value: ticketSummary.total,
+  icon: "🎫",
+  sub: "Toplam destek talebi",
+  border: "primary",
+},
+{
+  title: "Open Tickets",
+  value: ticketSummary.open,
+  icon: "🟠",
+  sub: "Açık ticket sayısı",
+  border: "warning",
+},
+{
+  title: "Critical Tickets",
+  value: ticketSummary.critical,
+  icon: "🚨",
+  sub: "Kritik öncelikli ticket",
+  border: "danger",
+},
   ];
 
   return (

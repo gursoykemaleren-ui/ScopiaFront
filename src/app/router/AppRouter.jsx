@@ -1,3 +1,5 @@
+import TicketDetailPage from "../../pages/TicketDetailPage";
+import TicketsPage from "../../pages/TicketsPage";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import AppLayout from "../../components/layout/AppLayout";
 import LoginPage from "../../pages/LoginPage";
@@ -36,6 +38,9 @@ function AppRouter() {
             <Route path="/customers/:id" element={<CustomerDetailPage />} />
             <Route path="/jobs" element={<JobListPage />} />
             <Route path="/jobs/:id" element={<JobDetailPage />} />
+            <Route path="/tickets" element={<TicketsPage />} />
+            <Route path="/tickets/:id" element={<TicketDetailPage />} />
+          
           </Route>
         </Route>
       </Routes>

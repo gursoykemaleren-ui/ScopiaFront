@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import NotificationDropdown from "./NotificationsDropdown";
 
 function Topbar() {
   const navigate = useNavigate();
@@ -32,6 +33,8 @@ function Topbar() {
       </div>
 
       <div className="d-flex align-items-center gap-3">
+        <NotificationDropdown />
+
         <div
           className="d-flex justify-content-center align-items-center rounded-circle bg-primary text-white fw-bold"
           style={{ width: "42px", height: "42px" }}

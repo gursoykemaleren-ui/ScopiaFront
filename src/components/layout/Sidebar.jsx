@@ -23,6 +23,11 @@ function Sidebar() {
         <NavLink to="/jobs" className={getLinkClass}>
           Jobs
         </NavLink>
+        
+        <NavLink to="/tickets" className={getLinkClass}>
+         Tickets
+       </NavLink>
+
       </nav>
     </aside>
   );
