@@ -2,7 +2,9 @@ import { NavLink } from "react-router-dom";
 
 function Sidebar() {
   const getLinkClass = ({ isActive }) =>
-    `nav-link rounded px-3 py-2 ${isActive ? "bg-primary text-white" : "text-white"}`;
+    `nav-link rounded px-3 py-2 ${
+      isActive ? "bg-primary text-white" : "text-white"
+    }`;
 
   return (
     <aside
@@ -23,11 +25,14 @@ function Sidebar() {
         <NavLink to="/jobs" className={getLinkClass}>
           Jobs
         </NavLink>
-        
-        <NavLink to="/tickets" className={getLinkClass}>
-         Tickets
-       </NavLink>
 
+        <NavLink to="/tickets" className={getLinkClass}>
+          Tickets
+        </NavLink>
+
+        <NavLink to="/documents" className={getLinkClass}>
+          Documents
+        </NavLink>
       </nav>
     </aside>
   );

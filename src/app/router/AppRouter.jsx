@@ -10,6 +10,8 @@ import ProtectedRoute from "./ProtectedRoute";
 import { getToken } from "../../services/storage/tokenStorage";
 import CustomerDetailPage from "../../pages/customer/CustomerDetailPage";
 import JobDetailPage from "../../pages/job/JobDetailPage";
+import DocumentsPage from "../../pages/DocumentsPage";
+
 
 function AppRouter() {
   const token = getToken();
@@ -40,7 +42,7 @@ function AppRouter() {
             <Route path="/jobs/:id" element={<JobDetailPage />} />
             <Route path="/tickets" element={<TicketsPage />} />
             <Route path="/tickets/:id" element={<TicketDetailPage />} />
-          
+            <Route path="/documents" element={<DocumentsPage />} />
           </Route>
         </Route>
       </Routes>

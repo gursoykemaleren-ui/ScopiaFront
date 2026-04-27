@@ -2,9 +2,23 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom";
 import { formatDateTimeTR, formatDateTR } from "../../utils/date";
+import {
+  getJobAttachments,
+  uploadJobAttachment,
+  deleteAttachment,
+  getAttachmentDownloadUrl,
+} from "../../services/api/attachmentApi";
+
 
 function JobDetailPage() {
   const { id } = useParams();
+
+  const [attachments, setAttachments] = useState([]);
+  const [attachmentFile, setAttachmentFile] = useState(null);
+  const [attachmentLoading, setAttachmentLoading] = useState(false);
+  const [attachmentUploading, setAttachmentUploading] = useState(false);
+  const [attachmentError, setAttachmentError] = useState("");
+  const [attachmentSuccess, setAttachmentSuccess] = useState("");
 
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -111,6 +125,87 @@ function JobDetailPage() {
         return "bg-secondary";
     }
   };
+
+  const fetchAttachments = async () => {
+  try {
+    setAttachmentLoading(true);
+    setAttachmentError("");
+
+    const data = await getJobAttachments(id);
+    setAttachments(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error("Dosyalar alınamadı:", err);
+    setAttachmentError("Dosyalar alınırken hata oluştu.");
+  } finally {
+    setAttachmentLoading(false);
+  }
+};
+
+const handleUploadAttachment = async (e) => {
+  e.preventDefault();
+
+  setAttachmentError("");
+  setAttachmentSuccess("");
+
+  if (!attachmentFile) {
+    setAttachmentError("Lütfen bir dosya seç.");
+    return;
+  }
+
+  try {
+    setAttachmentUploading(true);
+
+    await uploadJobAttachment(id, attachmentFile);
+
+    setAttachmentFile(null);
+    e.target.reset();
+
+    setAttachmentSuccess("Dosya başarıyla yüklendi.");
+
+    await fetchAttachments();
+    await fetchActivities();
+  } catch (err) {
+    console.error("Dosya yüklenemedi:", err);
+
+    const apiMessage =
+      err.response?.data?.message ||
+      err.response?.data ||
+      "Dosya yüklenemedi.";
+
+    setAttachmentError(apiMessage);
+  } finally {
+    setAttachmentUploading(false);
+  }
+};
+
+const handleDeleteAttachment = async (attachmentId) => {
+  const ok = window.confirm("Bu dosyayı silmek istiyor musun?");
+  if (!ok) return;
+
+  try {
+    await deleteAttachment(attachmentId);
+    await fetchAttachments();
+  } catch (err) {
+    console.error("Dosya silinemedi:", err);
+    setAttachmentError("Dosya silinemedi.");
+  }
+};
+
+const formatFileSize = (size) => {
+  if (!size) return "-";
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+};
+const getFileIcon = (contentType) => {
+  if (!contentType) return "📎";
+  if (contentType.includes("pdf")) return "📄";
+  if (contentType.startsWith("image/")) return "🖼️";
+  if (contentType.includes("word")) return "📝";
+  if (contentType.includes("excel") || contentType.includes("spreadsheet")) return "📊";
+  return "📎";
+};
+
 
   const fetchJob = async () => {
     try {
@@ -326,6 +421,7 @@ function JobDetailPage() {
     fetchJob();
     fetchActivities();
     fetchComments();
+    fetchAttachments();
   }, [id]);
 
   useEffect(() => {
@@ -643,6 +739,86 @@ function JobDetailPage() {
 
   </div>
 )}
+
+<div className="card shadow-sm border-0 mb-4">
+  <div className="card-body">
+    <h5 className="mb-3">Job Dosyaları</h5>
+
+    {attachmentError && (
+      <div className="alert alert-danger py-2">{attachmentError}</div>
+    )}
+    {attachmentSuccess && (
+  <div className="alert alert-success py-2">{attachmentSuccess}</div>
+    )}
+
+    <form onSubmit={handleUploadAttachment} className="d-flex gap-2 mb-3">
+      <input
+        type="file"
+        className="form-control"
+        onChange={(e) => setAttachmentFile(e.target.files?.[0] || null)}
+      />
+
+      <button
+        type="submit"
+        className="btn btn-primary"
+        disabled={attachmentUploading}
+      >
+        {attachmentUploading ? "Yükleniyor..." : "Yükle"}
+      </button>
+    </form>
+
+    {attachmentLoading ? (
+      <p className="text-muted mb-0">Dosyalar yükleniyor...</p>
+    ) : attachments.length === 0 ? (
+      <p className="text-muted mb-0">Bu iş için henüz dosya yok.</p>
+    ) : (
+      <div className="table-responsive">
+        <table className="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Dosya Adı</th>
+              <th>Tür</th>
+              <th>Boyut</th>
+              <th>Yüklenme Tarihi</th>
+              <th className="text-end">İşlem</th>
+            </tr>
+          </thead>
+          <tbody>
+            {attachments.map((file) => (
+              <tr key={file.id}>
+                <td>
+                <span className="me-2">{getFileIcon(file.contentType)}</span>
+               {file.originalFileName}
+                </td>
+                <td>{file.contentType || "-"}</td>
+                <td>{formatFileSize(file.size)}</td>
+                <td>{formatDateTimeTR(file.uploadedAt)}</td>
+                <td className="text-end">
+                  <a
+                    href={getAttachmentDownloadUrl(file.id)}
+                    className="btn btn-sm btn-outline-primary me-2"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    İndir
+                  </a>
+
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={() => handleDeleteAttachment(file.id)}
+                  >
+                    Sil
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </div>
+</div>
 
       <div className="card shadow-sm border-0">
         <div className="card-body">
