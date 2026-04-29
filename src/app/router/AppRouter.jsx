@@ -11,7 +11,8 @@ import { getToken } from "../../services/storage/tokenStorage";
 import CustomerDetailPage from "../../pages/customer/CustomerDetailPage";
 import JobDetailPage from "../../pages/job/JobDetailPage";
 import DocumentsPage from "../../pages/DocumentsPage";
-
+import CustomerAnalysisPage from "../../pages/CustomerAnalysisPage";
+import ReturnRequestsPage from "../../pages/ReturnRequestsPage";
 
 function AppRouter() {
   const token = getToken();
@@ -22,7 +23,11 @@ function AppRouter() {
         <Route
           path="/"
           element={
-            token ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
+            token ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Navigate to="/login" replace />
+            )
           }
         />
 
@@ -30,8 +35,6 @@ function AppRouter() {
           path="/login"
           element={token ? <Navigate to="/dashboard" replace /> : <LoginPage />}
         />
-
-        
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
@@ -43,6 +46,8 @@ function AppRouter() {
             <Route path="/tickets" element={<TicketsPage />} />
             <Route path="/tickets/:id" element={<TicketDetailPage />} />
             <Route path="/documents" element={<DocumentsPage />} />
+            <Route path="/customer-analysis" element={<CustomerAnalysisPage />} />
+            <Route path="/return-requests" element={<ReturnRequestsPage />} />
           </Route>
         </Route>
       </Routes>

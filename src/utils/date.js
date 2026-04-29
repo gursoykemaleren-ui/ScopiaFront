@@ -1,8 +1,22 @@
+function normalizeUtcDate(value) {
+  if (!value) return null;
+
+  if (
+    typeof value === "string" &&
+    !value.endsWith("Z") &&
+    !value.includes("+")
+  ) {
+    return `${value}Z`;
+  }
+
+  return value;
+}
+
 export function formatDateTimeTR(value) {
-  if (!value) return "-";
+  const normalized = normalizeUtcDate(value);
+  if (!normalized) return "-";
 
-  const date = new Date(value);
-
+  const date = new Date(normalized);
   if (Number.isNaN(date.getTime())) return "-";
 
   return new Intl.DateTimeFormat("tr-TR", {
@@ -18,10 +32,10 @@ export function formatDateTimeTR(value) {
 }
 
 export function formatDateTR(value) {
-  if (!value) return "-";
+  const normalized = normalizeUtcDate(value);
+  if (!normalized) return "-";
 
-  const date = new Date(value);
-
+  const date = new Date(normalized);
   if (Number.isNaN(date.getTime())) return "-";
 
   return new Intl.DateTimeFormat("tr-TR", {

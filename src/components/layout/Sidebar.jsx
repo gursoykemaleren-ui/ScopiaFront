@@ -11,7 +11,7 @@ function Sidebar() {
       className="bg-dark text-white p-3"
       style={{ width: "250px", minHeight: "100vh" }}
     >
-      <h4 className="mb-4">CRM WorkTrack</h4>
+      <h4 className="mb-4">ScopiaCRM</h4>
 
       <nav className="nav flex-column gap-2">
         <NavLink to="/dashboard" className={getLinkClass}>
@@ -32,6 +32,12 @@ function Sidebar() {
 
         <NavLink to="/documents" className={getLinkClass}>
           Documents
+        </NavLink>
+        <NavLink to="/customer-analysis" className={getLinkClass}>
+          Customer Analysis
+        </NavLink>
+        <NavLink to="/return-requests" className={getLinkClass}>
+          Return Requests
         </NavLink>
       </nav>
     </aside>
