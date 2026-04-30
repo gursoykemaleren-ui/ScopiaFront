@@ -69,8 +69,10 @@ function CustomerAnalysisPage() {
         );
 
         const customerReturns = returns.filter(
-          (returnRequest) => getCustomerId(returnRequest) === id
-        );
+  (returnRequest) =>
+    getCustomerId(returnRequest) === id &&
+    returnRequest.status === "Approved"
+);
 
         const ticketCount = customerTickets.length;
         const returnCount = customerReturns.length;

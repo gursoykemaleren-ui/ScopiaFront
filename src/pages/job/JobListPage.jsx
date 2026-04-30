@@ -377,7 +377,7 @@ function JobListPage() {
           ) : jobs.length === 0 ? (
             <p className="mb-0">Kayıt bulunamadı.</p>
           ) : (
-            <div className="table-responsive">
+            <div className="table-responsive jobs-table-scroll">
               <table className="table table-hover align-middle">
                 <thead>
                   <tr>

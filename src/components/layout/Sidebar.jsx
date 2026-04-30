@@ -1,42 +1,66 @@
 import { NavLink } from "react-router-dom";
 
 function Sidebar() {
-  const getLinkClass = ({ isActive }) =>
-    `nav-link rounded px-3 py-2 ${
-      isActive ? "bg-primary text-white" : "text-white"
-    }`;
+  const getLinkStyle = ({ isActive }) => ({
+    display: "block",
+    padding: "10px 14px",
+    borderRadius: "8px",
+    marginBottom: "8px",
+    color: "#ffffff",
+    textDecoration: "none",
+    background: isActive ? "#0d6efd" : "transparent",
+    transition: "0.2s",
+  });
 
   return (
     <aside
-      className="bg-dark text-white p-3"
-      style={{ width: "250px", minHeight: "100vh" }}
+      style={{
+        width: "230px",
+        minWidth: "230px",
+        maxWidth: "230px",
+        minHeight: "100vh",
+        background: "#1f2a3a",
+        color: "#ffffff",
+        padding: "18px 14px",
+        flexShrink: 0,
+      }}
     >
-      <h4 className="mb-4">ScopiaCRM</h4>
+      <div
+        style={{
+          fontWeight: "700",
+          fontSize: "18px",
+          marginBottom: "24px",
+        }}
+      >
+        ScopiaCRM
+      </div>
 
-      <nav className="nav flex-column gap-2">
-        <NavLink to="/dashboard" className={getLinkClass}>
+      <nav>
+        <NavLink to="/dashboard" style={getLinkStyle}>
           Dashboard
         </NavLink>
 
-        <NavLink to="/customers" className={getLinkClass}>
+        <NavLink to="/customers" style={getLinkStyle}>
           Customers
         </NavLink>
 
-        <NavLink to="/jobs" className={getLinkClass}>
+        <NavLink to="/jobs" style={getLinkStyle}>
           Jobs
         </NavLink>
 
-        <NavLink to="/tickets" className={getLinkClass}>
+        <NavLink to="/tickets" style={getLinkStyle}>
           Tickets
         </NavLink>
 
-        <NavLink to="/documents" className={getLinkClass}>
+        <NavLink to="/documents" style={getLinkStyle}>
           Documents
         </NavLink>
-        <NavLink to="/customer-analysis" className={getLinkClass}>
+
+        <NavLink to="/customer-analysis" style={getLinkStyle}>
           Customer Analysis
         </NavLink>
-        <NavLink to="/return-requests" className={getLinkClass}>
+
+        <NavLink to="/return-requests" style={getLinkStyle}>
           Return Requests
         </NavLink>
       </nav>

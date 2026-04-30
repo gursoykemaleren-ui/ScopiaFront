@@ -17,38 +17,69 @@ function Topbar() {
   const avatarLetter = userName.charAt(0).toUpperCase();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("roles");
-    localStorage.removeItem("perms");
-
+    localStorage.clear();
     navigate("/login");
   };
 
   return (
-    <div className="d-flex justify-content-between align-items-center px-4 py-3 border-bottom bg-white shadow-sm">
-      <div>
-        <h5 className="mb-0 fw-bold">CRM WorkTrack</h5>
-        <small className="text-muted">Admin Panel</small>
+    <div
+      style={{
+        position: "relative",
+        display: "flex",
+        alignItems: "center",
+        padding: "16px 24px",
+        borderBottom: "1px solid #e5e7eb",
+        background: "#fff",
+      }}
+    >
+      {/* ORTALANMIŞ BAŞLIK */}
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          transform: "translateX(-50%)",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ fontWeight: "700" }}>ScopiaCRM</div>
+        <small style={{ color: "#6b7280" }}>Admin Panel</small>
       </div>
 
-      <div className="d-flex align-items-center gap-3">
+      {/* SAĞ TARAF */}
+      <div
+        style={{
+          marginLeft: "auto",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+        }}
+      >
         <NotificationDropdown />
 
         <div
-          className="d-flex justify-content-center align-items-center rounded-circle bg-primary text-white fw-bold"
-          style={{ width: "42px", height: "42px" }}
+          style={{
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            background: "#0d6efd",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontWeight: "600",
+          }}
         >
           {avatarLetter}
         </div>
 
-        <div className="text-end">
-          <div className="fw-semibold">{userName}</div>
-          <small className="text-muted">{roleText}</small>
+        <div style={{ textAlign: "right" }}>
+          <div style={{ fontSize: "14px", fontWeight: "500" }}>
+            {userName}
+          </div>
+          <small style={{ color: "#6b7280" }}>{roleText}</small>
         </div>
 
         <button
-          type="button"
           className="btn btn-sm btn-outline-danger"
           onClick={handleLogout}
         >
