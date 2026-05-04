@@ -173,7 +173,7 @@ function ReturnRequestsPage() {
 
   return (
     <div>
-      <h2 className="fw-bold mb-1">Return Requests</h2>
+      <h2 className="fw-bold mb-1">İade Talepleri</h2>
 
       <div className="card mb-4">
         <div className="card-body">

@@ -77,7 +77,7 @@ function DocumentsPage() {
 
   return (
     <div>
-      <h2>Documents</h2>
+      <h2>Belge Yönetimi</h2>
       <p className="text-muted">Sisteme yüklenen tüm dosyalar</p>
 
       <div className="card shadow-sm border-0">

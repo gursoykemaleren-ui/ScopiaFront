@@ -5,6 +5,11 @@ export const getNotifications = async () => {
   return res.data;
 };
 
+export const getUnreadNotificationCount = async () => {
+  const res = await api.get("/notifications/unread-count");
+  return res.data;
+};
+
 export const markNotificationAsRead = async (id) => {
   await api.put(`/notifications/${id}/read`);
 };
@@ -15,4 +20,8 @@ export const markAllNotificationsAsRead = async () => {
 
 export const deleteNotification = async (id) => {
   await api.delete(`/notifications/${id}`);
+};
+
+export const clearNotifications = async () => {
+  await api.delete("/notifications/clear");
 };

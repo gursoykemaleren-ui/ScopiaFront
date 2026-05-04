@@ -445,7 +445,7 @@ const getFileIcon = (contentType) => {
     <div className="container-fluid">
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
-          <h2 className="mb-1">Job Detail</h2>
+          <h2 className="mb-1">İş Detayı</h2>
           <div className="text-muted">Job #{job.id}</div>
         </div>
 

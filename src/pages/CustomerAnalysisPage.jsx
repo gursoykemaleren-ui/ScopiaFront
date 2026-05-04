@@ -125,7 +125,7 @@ function CustomerAnalysisPage() {
 
   return (
     <div>
-      <h1 className="fw-bold">Customer Analysis</h1>
+      <h2 className="fw-bold">Müşteri Analizi</h2>
       <p className="text-muted">
         Müşteri iade oranı, destek yoğunluğu ve potansiyel segment analizi
       </p>

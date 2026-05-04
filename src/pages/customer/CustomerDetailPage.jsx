@@ -433,7 +433,7 @@ const handleCreateContact = async (e) => {
   return (
   <div>
     <div className="d-flex justify-content-between align-items-center mb-3">
-      <h2 className="mb-0">Customer Detail</h2>
+      <h2 className="mb-0">Müşteri Yönetimi</h2>
 
       <div className="d-flex gap-2">
         <button
@@ -604,7 +604,7 @@ const handleCreateContact = async (e) => {
       </div>
     </div>
 
-    {/* Customer Interactions */}
+    
     {/* Customer Interactions */}
 <div className="card mt-4">
   <div className="card-header">

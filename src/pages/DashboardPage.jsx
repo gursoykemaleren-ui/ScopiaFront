@@ -46,6 +46,18 @@ const dashboardStyle = `
 .dashboard-chart-box {
   height: 320px;
 }
+
+.calendar-item {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.calendar-item:hover {
+  background: #ffffff;
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08);
+}
 `;
 
 function DashboardPage() {
@@ -112,6 +124,49 @@ function DashboardPage() {
     return "bg-secondary";
   };
 
+  const getCalendarBadge = (dueDateValue) => {
+    if (!dueDateValue) {
+      return {
+        className: "bg-secondary",
+        text: "Tarih yok",
+      };
+    }
+
+    const today = new Date();
+    const dueDate = new Date(dueDateValue);
+
+    today.setHours(0, 0, 0, 0);
+    dueDate.setHours(0, 0, 0, 0);
+
+    const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) {
+      return {
+        className: "bg-danger",
+        text: `${Math.abs(diffDays)} gün gecikti`,
+      };
+    }
+
+    if (diffDays === 0) {
+      return {
+        className: "bg-warning text-dark",
+        text: "Bugün",
+      };
+    }
+
+    if (diffDays <= 3) {
+      return {
+        className: "bg-warning text-dark",
+        text: `${diffDays} gün kaldı`,
+      };
+    }
+
+    return {
+      className: "bg-primary",
+      text: `${diffDays} gün kaldı`,
+    };
+  };
+
   const totalPriorityCount = useMemo(() => {
     return (
       (priorityData.high ?? 0) +
@@ -137,6 +192,17 @@ function DashboardPage() {
       })),
     [jobsPerCustomer]
   );
+
+  const calendarJobs = useMemo(() => {
+    return recentJobs
+      .filter((job) => job.dueDate || job.DueDate)
+      .sort((a, b) => {
+        const dateA = new Date(a.dueDate || a.DueDate);
+        const dateB = new Date(b.dueDate || b.DueDate);
+        return dateA - dateB;
+      })
+      .slice(0, 6);
+  }, [recentJobs]);
 
   const PRIORITY_COLORS = ["#dc3545", "#ffc107", "#198754"];
 
@@ -230,69 +296,69 @@ function DashboardPage() {
 
   const mainKpis = [
     {
-      title: "Total Jobs",
+      title: "Toplam İş",
       value: summary.totalJobs,
       icon: "📋",
-      sub: "Toplam iş",
+      sub: "Sistemdeki toplam iş",
       border: "primary",
     },
     {
-      title: "Open Jobs",
+      title: "Açık İşler",
       value: summary.openJobs,
       icon: "🟦",
-      sub: "Açık işler",
+      sub: "Devam eden işler",
       border: "info",
     },
     {
-      title: "Completed Jobs",
+      title: "Tamamlanan İşler",
       value: summary.completedJobs,
       icon: "✅",
-      sub: "Tamamlanan işler",
+      sub: "Kapatılmış işler",
       border: "success",
     },
     {
-      title: "Total Tickets",
+      title: "Toplam Destek Talebi",
       value: ticketSummary.total,
       icon: "🎫",
-      sub: "Toplam destek talebi",
+      sub: "Sistemdeki ticket sayısı",
       border: "primary",
     },
   ];
 
   const secondaryKpis = [
     {
-      title: "Overdue Jobs",
+      title: "Geciken İşler",
       value: summary.overdueJobs,
       icon: "⏰",
-      sub: "Gecikmiş işler",
+      sub: "Termin tarihi geçmiş işler",
       border: "danger",
     },
     {
-      title: "Unassigned Jobs",
+      title: "Atanmamış İşler",
       value: unassignedCount,
       icon: "👤",
-      sub: "Atanmamış işler",
+      sub: "Henüz kullanıcıya atanmamış",
       border: "warning",
     },
     {
-      title: "My Assigned Jobs",
+      title: "Bana Atanan İşler",
       value: summary.myAssignedJobs,
       icon: "🧑‍💻",
-      sub: "Bana atanmış işler",
+      sub: "Kullanıcıya atanmış işler",
       border: "dark",
     },
     {
-      title: "Open Tickets",
+      title: "Açık Ticket",
       value: ticketSummary.open,
       icon: "🟠",
-      sub: "Açık ticket",
+      sub: "Açık destek talepleri",
       border: "warning",
     },
     {
-      title: "Critical Tickets",
+      title: "Kritik Ticket",
       value: ticketSummary.critical,
       icon: "🚨",
-      sub: "Kritik ticket",
+      sub: "Kritik öncelikli talepler",
       border: "danger",
     },
   ];
@@ -303,9 +369,9 @@ function DashboardPage() {
 
       <div className="container-fluid py-3">
         <div className="mb-4">
-          <h2 className="mb-1 fw-bold">Dashboard</h2>
+          <h2 className="mb-1 fw-bold">Ana Grafikler</h2>
           <p className="text-muted mb-0">
-            CRM WorkTrack genel durum, iş yoğunluğu ve son aktiviteler
+            Genel durum, iş yoğunluğu, yaklaşan teslim tarihleri ve son aktiviteler
           </p>
         </div>
 
@@ -327,7 +393,7 @@ function DashboardPage() {
               {mainKpis.map((card) => (
                 <div className="col-12 col-sm-6 col-xl-3" key={card.title}>
                   <div
-                    className={`card h-100 shadow-sm border-start border-4 border-${card.border} dashboard-card dashboard-hover-card`}
+                    className={`card h-100 shadow-sm border-start border-4 border-${card.border} dashboard-card`}
                   >
                     <div className="card-body">
                       <div className="d-flex justify-content-between align-items-start gap-3">
@@ -346,8 +412,8 @@ function DashboardPage() {
             </div>
 
             <div className="row g-3 mb-4">
-              {secondaryKpis.map((card) =>
-                              <div className="col-12 col-sm-6 col-xl" key={card.title}>
+              {secondaryKpis.map((card) => (
+                <div className="col-12 col-sm-6 col-xl" key={card.title}>
                   <div
                     className={`card h-100 shadow-sm border-start border-4 border-${card.border} dashboard-card`}
                   >
@@ -363,7 +429,7 @@ function DashboardPage() {
                     </div>
                   </div>
                 </div>
-              )};
+              ))}
             </div>
 
             <div className="row g-4 mb-4">
@@ -371,7 +437,7 @@ function DashboardPage() {
                 <div className="alert alert-danger shadow-sm mb-0 h-100">
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
-                      <h6 className="fw-bold mb-1">Overdue Jobs Alert</h6>
+                      <h6 className="fw-bold mb-1">Geciken İş Uyarısı</h6>
                       <div>
                         Termin tarihi geçmiş <strong>{overdueCount}</strong> iş var.
                       </div>
@@ -385,7 +451,7 @@ function DashboardPage() {
                 <div className="alert alert-warning shadow-sm mb-0 h-100">
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
-                      <h6 className="fw-bold mb-1">Unassigned Jobs Alert</h6>
+                      <h6 className="fw-bold mb-1">Atanmamış İş Uyarısı</h6>
                       <div>
                         Henüz kullanıcıya atanmamış{" "}
                         <strong>{unassignedCount}</strong> iş var.
@@ -403,10 +469,10 @@ function DashboardPage() {
                   <div className="card-body">
                     <div className="mb-3">
                       <div className="dashboard-section-title">
-                        Jobs by Priority
+                        Öncelik Bazlı İş Dağılımı
                       </div>
                       <div className="text-muted small">
-                        Öncelik bazlı iş dağılımı
+                        İşlerin öncelik seviyelerine göre dağılımı
                       </div>
                     </div>
 
@@ -451,10 +517,10 @@ function DashboardPage() {
                   <div className="card-body">
                     <div className="mb-3">
                       <div className="dashboard-section-title">
-                        Jobs per Customer
+                        Müşteri Bazlı İş Yoğunluğu
                       </div>
                       <div className="text-muted small">
-                        Müşteri bazlı iş yoğunluğu
+                        Müşterilere göre açılan iş sayıları
                       </div>
                     </div>
 
@@ -496,12 +562,87 @@ function DashboardPage() {
               </div>
             </div>
 
+            <div className="card shadow-sm border-0 dashboard-card mb-4">
+              <div className="card-body">
+                <div className="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+                  <div>
+                    <div className="dashboard-section-title">
+                      Yaklaşan İş Takvimi
+                    </div>
+                    <div className="text-muted small">
+                      Son teslim tarihi yaklaşan ve geciken işler
+                    </div>
+                  </div>
+
+                  <span className="badge bg-light text-dark border">
+                    {calendarJobs.length} kayıt
+                  </span>
+                </div>
+
+                {!calendarJobs.length ? (
+                  <p className="text-muted mb-0">
+                    Takvimde gösterilecek son teslim tarihli iş bulunamadı.
+                  </p>
+                ) : (
+                  <div className="row g-3">
+                    {calendarJobs.map((job) => {
+                      const dueDateValue = job.dueDate || job.DueDate;
+                      const badge = getCalendarBadge(dueDateValue);
+
+                      return (
+                        <div className="col-12 col-md-6 col-xl-4" key={job.id}>
+                          <div className="calendar-item p-3 h-100">
+                            <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
+                              <div>
+                                <div className="fw-bold">
+                                  {job.title || "Başlıksız İş"}
+                                </div>
+                                <div className="text-muted small">
+                                  {job.customerName || "Müşteri bilgisi yok"}
+                                </div>
+                              </div>
+
+                              <span className={`badge ${badge.className}`}>
+                                {badge.text}
+                              </span>
+                            </div>
+
+                            <div className="text-muted small mb-2">
+                              Teslim Tarihi: {formatDateTR(dueDateValue)}
+                            </div>
+
+                            <div className="d-flex flex-wrap gap-2">
+                              <span
+                                className={`badge ${getStatusBadgeClass(
+                                  job.status
+                                )}`}
+                              >
+                                {job.status || "Durum yok"}
+                              </span>
+
+                              <span
+                                className={`badge ${getPriorityBadgeClass(
+                                  job.priority
+                                )}`}
+                              >
+                                {job.priority || "Öncelik yok"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="row g-4">
               <div className="col-12 col-xl-6">
                 <div className="card shadow-sm border-0 h-100 dashboard-card">
                   <div className="card-body">
                     <div className="mb-3">
-                      <div className="dashboard-section-title">Recent Jobs</div>
+                      <div className="dashboard-section-title">Son İşler</div>
                       <div className="text-muted small">
                         Son eklenen veya güncellenen işler
                       </div>
@@ -514,11 +655,11 @@ function DashboardPage() {
                         <table className="table table-hover align-middle mb-0">
                           <thead className="table-light">
                             <tr>
-                              <th>Title</th>
-                              <th>Customer</th>
-                              <th>Status</th>
-                              <th>Priority</th>
-                              <th>Created</th>
+                              <th>Başlık</th>
+                              <th>Müşteri</th>
+                              <th>Durum</th>
+                              <th>Öncelik</th>
+                              <th>Oluşturulma</th>
                             </tr>
                           </thead>
 
@@ -561,7 +702,7 @@ function DashboardPage() {
                   <div className="card-body">
                     <div className="mb-3">
                       <div className="dashboard-section-title">
-                        Recent Activities
+                        Son Aktiviteler
                       </div>
                       <div className="text-muted small">
                         Sistemdeki son hareketler
@@ -594,18 +735,18 @@ function DashboardPage() {
                                   <div className="fw-semibold">
                                     {activity.message ||
                                       activity.type ||
-                                      "Activity"}
+                                      "Aktivite"}
                                   </div>
 
                                   <div className="text-muted small mt-1">
                                     {activity.jobTitle
-                                      ? `Job: ${activity.jobTitle}`
+                                      ? `İş: ${activity.jobTitle}`
                                       : activity.type || "-"}
                                   </div>
 
                                   {activity.performedByUserName && (
                                     <div className="text-muted small">
-                                      By: {activity.performedByUserName}
+                                      Kullanıcı: {activity.performedByUserName}
                                     </div>
                                   )}
                                 </div>

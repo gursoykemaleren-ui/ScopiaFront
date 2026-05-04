@@ -1,6 +1,21 @@
 import { NavLink } from "react-router-dom";
 
 function Sidebar() {
+  let roles = [];
+
+  try {
+    const parsedRoles = JSON.parse(localStorage.getItem("roles")) || [];
+    roles = Array.isArray(parsedRoles) ? parsedRoles : [];
+  } catch {
+    roles = [];
+  }
+
+  const userName = localStorage.getItem("userName") || "";
+
+  const isAdmin =
+    userName.toLowerCase() === "admin" ||
+    roles.some((role) => String(role).toLowerCase() === "admin");
+
   const getLinkStyle = ({ isActive }) => ({
     display: "block",
     padding: "10px 14px",
@@ -11,6 +26,23 @@ function Sidebar() {
     background: isActive ? "#0d6efd" : "transparent",
     transition: "0.2s",
   });
+
+  const disabledLinkStyle = {
+    display: "block",
+    padding: "10px 14px",
+    borderRadius: "8px",
+    marginBottom: "8px",
+    color: "#ffffff",
+    textDecoration: "none",
+    background: "transparent",
+    opacity: 0.55,
+    cursor: "not-allowed",
+    transition: "0.2s",
+  };
+
+  const handleUnauthorizedClick = () => {
+    alert("Kullanıcı Yönetimi modülünü yalnızca admin kullanabilir.");
+  };
 
   return (
     <aside
@@ -37,31 +69,45 @@ function Sidebar() {
 
       <nav>
         <NavLink to="/dashboard" style={getLinkStyle}>
-          Dashboard
+          Ana Grafikler
         </NavLink>
 
         <NavLink to="/customers" style={getLinkStyle}>
-          Customers
+          Müşteri Yönetimi
         </NavLink>
 
         <NavLink to="/jobs" style={getLinkStyle}>
-          Jobs
+          İş Yönetimi
         </NavLink>
 
         <NavLink to="/tickets" style={getLinkStyle}>
-          Tickets
+          Destek Talepleri
         </NavLink>
 
         <NavLink to="/documents" style={getLinkStyle}>
-          Documents
+          Belge Yönetimi
         </NavLink>
 
         <NavLink to="/customer-analysis" style={getLinkStyle}>
-          Customer Analysis
+          Müşteri Analizi
         </NavLink>
 
         <NavLink to="/return-requests" style={getLinkStyle}>
-          Return Requests
+          İade Talepleri
+        </NavLink>
+
+        {isAdmin ? (
+          <NavLink to="/admin/users" style={getLinkStyle}>
+            Kullanıcı Yönetimi
+          </NavLink>
+        ) : (
+          <div style={disabledLinkStyle} onClick={handleUnauthorizedClick}>
+            Kullanıcı Yönetimi
+          </div>
+        )}
+
+        <NavLink to="/reports" style={getLinkStyle}>
+          Raporlama
         </NavLink>
       </nav>
     </aside>

@@ -33,17 +33,19 @@ function Topbar() {
       }}
     >
       {/* ORTALANMIŞ BAŞLIK */}
-      <div
-        style={{
-          position: "absolute",
-          left: "50%",
-          transform: "translateX(-50%)",
-          textAlign: "center",
-        }}
-      >
-        <div style={{ fontWeight: "700" }}>ScopiaCRM</div>
-        <small style={{ color: "#6b7280" }}>Admin Panel</small>
-      </div>
+<div
+  style={{
+    position: "absolute",
+    left: "50%",
+    transform: "translateX(-50%)",
+    textAlign: "center",
+  }}
+>
+  <div style={{ fontWeight: "700" }}>ScopiaCRM</div>
+  <small style={{ color: "#6b7280" }}>
+    {userName} Kullanıcı Paneli
+  </small>
+</div>
 
       {/* SAĞ TARAF */}
       <div
@@ -83,7 +85,7 @@ function Topbar() {
           className="btn btn-sm btn-outline-danger"
           onClick={handleLogout}
         >
-          Logout
+          Çıkış
         </button>
       </div>
     </div>

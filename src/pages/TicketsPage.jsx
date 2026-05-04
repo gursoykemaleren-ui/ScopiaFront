@@ -120,7 +120,7 @@ const handleDelete = async (id) => {
 
   return (
    <div className="container-fluid p-4">
-  <h2 className="mb-4">Tickets</h2>
+  <h2 className="fw-bold mb-1">Destek Talepleri</h2>
 
   <div className="card mb-4 shadow-sm">
     <div className="card-header">
