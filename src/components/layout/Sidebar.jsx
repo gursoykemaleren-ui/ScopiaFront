@@ -104,10 +104,10 @@ function Sidebar() {
   return (
     <aside
       style={{
-        width: "230px",
-        minWidth: "230px",
-        maxWidth: "230px",
-        minHeight: "100vh",
+        width: "330px",
+        minWidth: "330px",
+        maxWidth: "330px",
+        minHeight: "330vh",
         background: "#1f2a3a",
         color: "#ffffff",
         padding: "18px 14px",
@@ -117,8 +117,8 @@ function Sidebar() {
       <div
         style={{
           fontWeight: "700",
-          fontSize: "18px",
-          marginBottom: "20px",
+          fontSize: "35px",
+          marginBottom: "25px",
         }}
       >
         ScopiaCRM
