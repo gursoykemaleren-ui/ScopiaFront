@@ -104,10 +104,10 @@ function Sidebar() {
   return (
     <aside
       style={{
-        width: "330px",
-        minWidth: "330px",
-        maxWidth: "330px",
-        minHeight: "330vh",
+        width: "300px",
+        minWidth: "300px",
+        maxWidth: "300px",
+        minHeight: "300vh",
         background: "#1f2a3a",
         color: "#ffffff",
         padding: "18px 14px",
@@ -115,14 +115,49 @@ function Sidebar() {
       }}
     >
       <div
-        style={{
-          fontWeight: "700",
-          fontSize: "35px",
-          marginBottom: "25px",
-        }}
-      >
-        ScopiaCRM
-      </div>
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    marginBottom: "25px",
+    padding: "6px 4px",
+  }}
+>
+  <img
+    src="/scopia-logo.png"
+    alt="ScopiaCRM Logo"
+    style={{
+      width: "100px",
+      height: "100px",
+      borderRadius: "14px",
+      objectFit: "cover",
+      background: "#ffffff",
+      padding: "3px",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.18)",
+    }}
+  />
+
+  <div>
+    <div
+      style={{
+        fontWeight: "800",
+        fontSize: "27px",
+        lineHeight: "1.1",
+      }}
+    >
+      ScopiaCRM
+    </div>
+
+    <small
+      style={{
+        color: "#cbd5e1",
+        fontSize: "12px",
+      }}
+    >
+      CRM & İş Takibi
+    </small>
+  </div>
+</div>
 
       <nav>
         <SectionHeader
