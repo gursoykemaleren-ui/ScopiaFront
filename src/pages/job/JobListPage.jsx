@@ -3,11 +3,13 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { formatDateTR } from "../../utils/date";
 import { adminUserApi } from "../../services/api/adminUserApi";
+import { departmentApi } from "../../services/api/departmentApi";
 
 function JobListPage() {
   const [jobs, setJobs] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [users, setUsers] = useState([]);
+  const [departments, setDepartments] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -16,6 +18,7 @@ function JobListPage() {
   const [title, setTitle] = useState("");
   const [customerId, setCustomerId] = useState("");
   const [assignedToUserId, setAssignedToUserId] = useState("");
+  const [createAssignedDepartmentId, setCreateAssignedDepartmentId] = useState("");
   const [priority, setPriority] = useState("Medium");
   const [status, setStatus] = useState("Open");
   const [dueDate, setDueDate] = useState("");
@@ -25,6 +28,8 @@ function JobListPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("");
+  const [createdDepartmentFilter, setCreatedDepartmentFilter] = useState("");
+  const [assignedDepartmentFilter, setAssignedDepartmentFilter] = useState("");
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem("token");
@@ -39,6 +44,18 @@ function JobListPage() {
     if (Array.isArray(data?.$values)) return data.$values;
     return [];
   };
+
+  const getUserDepartmentId = (user) => {
+  return user.departmentId ?? user.DepartmentId ?? user.department?.id ?? user.Department?.Id;
+};
+
+  const filteredUsers = createAssignedDepartmentId
+  ? users.filter(
+      (user) =>
+        String(getUserDepartmentId(user)) ===
+        String(createAssignedDepartmentId)
+    )
+  : users;
 
   const getUserId = (user) => {
     return user.id ?? user.userId ?? user.UserId ?? user.Id;
@@ -99,6 +116,16 @@ function JobListPage() {
     }
   };
 
+  const fetchDepartments = async () => {
+  try {
+    const data = await departmentApi.getAll();
+    setDepartments(normalizeList(data));
+  } catch (err) {
+    console.error("Departmanlar alınamadı:", err);
+    setDepartments([]);
+  }
+};
+
   const fetchJobs = async () => {
     try {
       setLoading(true);
@@ -115,6 +142,14 @@ function JobListPage() {
 
       if (priorityFilter) {
         params.priority = priorityFilter;
+      }
+     
+      if (createdDepartmentFilter) {
+      params.createdDepartmentId = createdDepartmentFilter;
+      }
+
+      if (assignedDepartmentFilter) {
+      params.assignedDepartmentId = assignedDepartmentFilter;
       }
 
       const response = await axios.get("http://localhost:5002/api/jobs", {
@@ -235,18 +270,17 @@ function JobListPage() {
       setCreating(true);
 
       const payload = {
-        title: title.trim(),
-        customerId: Number(customerId),
-        priority,
-        status,
-        description: description.trim() || null,
-        dueDate: dueDate || null,
-      };
+      title: title.trim(),
+      customerId: Number(customerId),
+      priority,
+      status,
+      description: description.trim() || null,
+      dueDate: dueDate || null,
+    };
 
-      if (assignedToUserId) {
-        payload.assignedToUserId = Number(assignedToUserId);
-      }
-
+   if (assignedToUserId) {
+    payload.assignedToUserId = Number(assignedToUserId);
+   }
       await axios.post("http://localhost:5002/api/jobs", payload, {
         headers: {
           ...getAuthHeaders(),
@@ -257,6 +291,7 @@ function JobListPage() {
       setTitle("");
       setCustomerId("");
       setAssignedToUserId("");
+      setCreateAssignedDepartmentId("");
       setPriority("Medium");
       setStatus("Open");
       setDueDate("");
@@ -289,16 +324,24 @@ function JobListPage() {
     setSearch("");
     setStatusFilter("");
     setPriorityFilter("");
+    setCreatedDepartmentFilter("");
+    setAssignedDepartmentFilter("");
   };
 
   useEffect(() => {
     fetchCustomers();
     fetchUsers();
+    fetchDepartments();
   }, []);
 
   useEffect(() => {
     fetchJobs();
-  }, [search, statusFilter, priorityFilter]);
+  }, [search, 
+      statusFilter, 
+      priorityFilter,
+      createdDepartmentFilter,
+      assignedDepartmentFilter,
+  ]);
 
   return (
     <div className="container-fluid">
@@ -342,21 +385,41 @@ function JobListPage() {
               </div>
 
               <div className="col-md-4">
-                <label className="form-label">Atanacak Kullanıcı</label>
-                <select
-                  className="form-select"
-                  value={assignedToUserId}
-                  onChange={(e) => setAssignedToUserId(e.target.value)}
-                >
-                  <option value="">Atanmamış oluştur</option>
-                  {users.map((user) => (
-                    <option key={getUserId(user)} value={getUserId(user)}>
-                      {getUserName(user)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <label className="form-label">Atanan Departman</label>
+              <select
+                className="form-select"
+                value={createAssignedDepartmentId}
+                onChange={(e) => {
+                setCreateAssignedDepartmentId(e.target.value);
+                setAssignedToUserId("");
+            }}
+           >
+            <option value="">Tümü</option>
+           {departments.map((department) => (
+            <option key={department.id} value={department.id}>
+           {department.name}
+           </option>
+           ))}
+          </select>
+          </div>
 
+        <div className="col-md-3">
+        <label className="form-label">Atanacak Kullanıcı</label>
+        <select
+      className="form-select"
+      value={assignedToUserId}
+      onChange={(e) => setAssignedToUserId(e.target.value)}
+     >
+      <option value="">Atanmamış oluştur</option>
+
+       {filteredUsers.map((user) => (
+       <option key={getUserId(user)} value={getUserId(user)}>
+       {getUserName(user)}
+     </option>
+    ))}
+  </select>
+</div>
+          
               <div className="col-md-4">
                 <label className="form-label">Öncelik</label>
                 <select
@@ -370,7 +433,8 @@ function JobListPage() {
                 </select>
               </div>
 
-              <div className="col-md-4">
+            
+              <div className="col-md-3">
                 <label className="form-label">Durum</label>
                 <select
                   className="form-select"
@@ -463,7 +527,37 @@ function JobListPage() {
                   <option value="High">Yüksek</option>
                 </select>
               </div>
+            <div className="col-md-3">
+              <label className="form-label">Oluşturan Departman</label>
+               <select
+               className="form-select"
+               value={createdDepartmentFilter}
+               onChange={(e) => setCreatedDepartmentFilter(e.target.value)}
+               >
+              <option value="">Tümü</option>
+              {departments.map((department) => (
+              <option key={department.id} value={department.id}>
+              {department.name}
+              </option>
+              ))}
+             </select>
+           </div>
 
+          <div className="col-md-3">
+            <label className="form-label">Atanan Departman</label>
+            <select
+            className="form-select"
+            value={assignedDepartmentFilter}
+            onChange={(e) => setAssignedDepartmentFilter(e.target.value)}
+             >
+            <option value="">Tümü</option>
+            {departments.map((department) => (
+            <option key={department.id} value={department.id}>
+            {department.name}
+            </option>
+             ))}
+           </select>
+            </div>
               <div className="col-md-2 d-flex gap-2">
                 <button type="submit" className="btn btn-primary w-100">
                   Ara
@@ -499,6 +593,8 @@ function JobListPage() {
                     <th>Öncelik</th>
                     <th>Son Teslim</th>
                     <th>Atanan Kullanıcı</th>
+                    <th>Oluşturulan Departman</th>
+                    <th>Atanan Departman</th>
                     <th>İşlem</th>
                   </tr>
                 </thead>
@@ -546,8 +642,18 @@ function JobListPage() {
                           ))}
                         </select>
                       </td>
-
                       <td>
+                      {job.createdByDepartmentName ||
+                      job.CreatedByDepartmentName ||
+                       "-"}
+                      </td>
+                      <td>
+                      {job.assignedDepartmentName ||
+                      job.AssignedDepartmentName ||
+                      "-"}
+                      </td>
+                      <td>
+
                         <div className="d-flex gap-2">
                           <Link
                             to={`/jobs/${job.id}`}

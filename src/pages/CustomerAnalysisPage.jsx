@@ -68,15 +68,20 @@ function CustomerAnalysisPage() {
           (ticket) => getCustomerId(ticket) === id
         );
 
-        const customerReturns = returns.filter(
-  (returnRequest) =>
-    getCustomerId(returnRequest) === id &&
-    returnRequest.status === "Approved"
-);
+      const customerReturns = returns.filter(
+     (returnRequest) => getCustomerId(returnRequest) === id
+     );
 
-        const ticketCount = customerTickets.length;
-        const returnCount = customerReturns.length;
-        const totalRequest = ticketCount + returnCount;
+     const approvedReturns = customerReturns.filter(
+     (returnRequest) =>
+     returnRequest.status === "Approved" ||
+     returnRequest.status === "Onaylandı"
+    );
+
+   const ticketCount = customerTickets.length;
+   const returnCount = approvedReturns.length;
+   const totalReturnRequestCount = customerReturns.length;
+   const totalRequest = ticketCount + totalReturnRequestCount;
 
         const returnRate =
           totalRequest > 0
