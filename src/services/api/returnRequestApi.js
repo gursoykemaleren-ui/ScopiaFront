@@ -15,3 +15,7 @@ export const updateReturnStatus = async (id, status) => {
   return res.data;
 };
 
+export const deleteReturnRequest = async (id) => {
+  const res = await api.delete(`/returnrequests/${id}`);
+  return res.data;
+};

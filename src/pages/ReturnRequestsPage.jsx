@@ -3,6 +3,7 @@ import {
   getAllReturnRequests,
   createReturnRequest,
   updateReturnStatus,
+  deleteReturnRequest,
 } from "../services/api/returnRequestApi";
 import { customerApi } from "../services/api/customerApi";
 import { formatDateTimeTR } from "../utils/date";
@@ -97,6 +98,18 @@ function ReturnRequestsPage() {
     }
   };
 
+  const handleDelete = async (id) => {
+  if (!window.confirm("Bu iade talebini silmek istiyor musun?")) return;
+
+  try {
+    await deleteReturnRequest(id);
+    await loadData();
+  } catch (err) {
+    console.error("İade talebi silinemedi:", err);
+    alert("İade talebi silinemedi.");
+  }
+};
+
   if (loading) return <p>Yükleniyor...</p>;
 
   const pending = returnRequests.filter((x) => x.status === "Pending");
@@ -109,14 +122,14 @@ function ReturnRequestsPage() {
         <h5 className="fw-bold mb-3">{title}</h5>
 
         <div className="table-responsive">
-          <table className="table align-middle">
+          <table className="table table-sm table-hover align-middle mb-0">
             <thead>
               <tr>
                 <th>Müşteri</th>
                 <th>Neden</th>
                 <th>Açıklama</th>
                 <th>Tarih</th>
-                <th>İşlem</th>
+                <th className="text-end">İşlem</th>
               </tr>
             </thead>
 
@@ -127,44 +140,50 @@ function ReturnRequestsPage() {
                   <td>{item.reason}</td>
                   <td>{item.description || "-"}</td>
                   <td>{formatDateTimeTR(item.createdAt)}</td>
-                  <td>
-                    {type === "pending" ? (
-                      <>
-                        <button
-                          type="button"
-                          className="btn btn-success btn-sm me-2"
-                          onClick={() =>
-                            handleStatusChange(item.id, "Approved")
-                          }
-                        >
-                          Onayla
-                        </button>
+                  <td className="text-end text-nowrap">
+           <div className="d-inline-flex gap-2">
+           {type === "pending" ? (
+            <>
+            <button
+             type="button"
+             className="btn btn-success btn-sm"
+             onClick={() => handleStatusChange(item.id, "Approved")}
+             >
+             Onayla
+            </button>
 
-                        <button
-                          type="button"
-                          className="btn btn-danger btn-sm"
-                          onClick={() =>
-                            handleStatusChange(item.id, "Rejected")
-                          }
-                        >
-                          Reddet
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-sm"
-                        onClick={() => handleStatusChange(item.id, "Pending")}
-                      >
-                        Geri Çek
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            <button
+            type="button"
+            className="btn btn-danger btn-sm"
+            onClick={() => handleStatusChange(item.id, "Rejected")}
+            >
+            Reddet
+          </button>
+          </>
+        ) : (
+            <button
+           type="button"
+           className="btn btn-secondary btn-sm"
+           onClick={() => handleStatusChange(item.id, "Pending")}
+          >
+          Geri Çek
+        </button>
+       )}
+
+       <button
+       type="button"
+       className="btn btn-outline-danger btn-sm"
+       onClick={() => handleDelete(item.id)}
+       >
+       Sil
+       </button>
+      </div>
+       </td>
+  </tr>
+  ))}
+</tbody>
+</table>
+</div>
 
         {data.length === 0 && <p className="text-muted mb-0">Kayıt yok.</p>}
       </div>

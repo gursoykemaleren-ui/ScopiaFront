@@ -755,6 +755,7 @@ const getFileIcon = (contentType) => {
       <input
         type="file"
         className="form-control"
+        accept = ".png,.jpg,.jpeg,.pdf,.txt,.csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
         onChange={(e) => setAttachmentFile(e.target.files?.[0] || null)}
       />
 
