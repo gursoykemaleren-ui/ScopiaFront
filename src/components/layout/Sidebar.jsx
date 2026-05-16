@@ -103,17 +103,20 @@ function Sidebar() {
 
   return (
     <aside
-      style={{
-        width: "300px",
-        minWidth: "300px",
-        maxWidth: "300px",
-        minHeight: "300vh",
-        background: "#1f2a3a",
-        color: "#ffffff",
-        padding: "18px 14px",
-        flexShrink: 0,
-      }}
-    >
+    style={{
+    width: "300px",
+    minWidth: "300px",
+    maxWidth: "300px",
+    height: "100vh",
+    position: "sticky",
+    top: 0,
+    background: "#1f2a3a",
+    color: "#ffffff",
+    padding: "18px 14px",
+    flexShrink: 0,
+    overflowY: "auto",
+  }}
+>
       <div
   style={{
     display: "flex",
@@ -192,6 +195,10 @@ function Sidebar() {
 
             <NavLink to="/documents" style={getLinkStyle}>
               Belge Yönetimi
+            </NavLink>
+
+            <NavLink to="/accounting" style={getLinkStyle}>
+              Ön Muhasebe Yönetimi
             </NavLink>
 
             {isAdmin ? (

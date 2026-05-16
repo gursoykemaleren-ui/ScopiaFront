@@ -192,7 +192,13 @@ function ReturnRequestsPage() {
 
   return (
     <div>
-      <h2 className="fw-bold mb-1">İade Talepleri</h2>
+      <div className="mb-4">
+    <h2 className="fw-bold mb-1">İade Talepleri</h2>
+
+     <p className="text-muted mb-0">
+     Müşteri iade taleplerini oluşturabilir, bekleyen talepleri onaylayabilir veya reddedebilirsiniz.
+     </p>
+     </div>
 
       <div className="card mb-4">
         <div className="card-body">

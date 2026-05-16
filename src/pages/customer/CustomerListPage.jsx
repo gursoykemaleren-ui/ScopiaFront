@@ -162,16 +162,21 @@ const restoreCustomer = async (id) => {
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-1 fw-bold">Müşteri Yönetimi</h2>
-        
-        <button
-          className="btn btn-primary"
-          onClick={() => setShowModal(true)}
-        >
-          Yeni Customer
-        </button>
-      </div>
+     <div className="mb-4">
+     <div className="mb-3">
+     <h2 className="fw-bold mb-1">Müşteri Yönetimi</h2>
+     <p className="text-muted mb-0">
+      Müşteri kayıtlarını görüntüleme, detay inceleme ve müşteri bilgilerini yönetme alanı
+     </p>
+     </div>
+
+     <button
+     className="btn btn-primary"
+     onClick={() => setShowModal(true)}
+     >
+     Yeni Customer
+      </button>
+     </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
 

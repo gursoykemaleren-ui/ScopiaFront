@@ -120,7 +120,13 @@ const handleDelete = async (id) => {
 
   return (
    <div className="container-fluid p-4">
-  <h2 className="fw-bold mb-1">Destek Talepleri</h2>
+  <div className="mb-4">
+    <h2 className="fw-bold mb-1">Destek Talepleri</h2>
+
+    <p className="text-muted mb-0">
+      Müşterilerden gelen destek taleplerini takip edebilir, atama yapabilir ve durumlarını güncelleyebilirsiniz.
+    </p>
+  </div>
 
   <div className="card mb-4 shadow-sm">
     <div className="card-header">

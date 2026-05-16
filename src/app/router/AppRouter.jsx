@@ -15,6 +15,7 @@ import CustomerAnalysisPage from "../../pages/CustomerAnalysisPage";
 import ReturnRequestsPage from "../../pages/ReturnRequestsPage";
 import AdminUsersPage from "../../pages/AdminUsersPage";
 import ReportsPage from "../../pages/ReportsPage";
+import AccountingPage from "../../pages/AccountingPage";
 
 function getRolesFromStorage() {
   try {
@@ -102,6 +103,7 @@ function AppRouter() {
             <Route path="/customer-analysis" element={<CustomerAnalysisPage />} />
             <Route path="/return-requests" element={<ReturnRequestsPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/accounting" element={<AccountingPage />} />
 
             <Route
               path="/admin/users"
