@@ -93,7 +93,7 @@ function LoginPage() {
             top: 0;
             left: 0;
             right: 0;
-            height: 76px;
+            height: 100px;
             z-index: 1000;
             background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(14px);
@@ -112,29 +112,25 @@ function LoginPage() {
           }
 
           .brand-mark {
-            width: 42px;
-            height: 42px;
+            width: 130px;
+            height: 130px;
             border-radius: 14px;
-            background: linear-gradient(135deg, var(--scopia-dark), var(--scopia-blue), var(--scopia-cyan));
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 24px;
+            object-fit: contain;
+            background: white;
+            padding: 4px;
             box-shadow: 0 10px 24px rgba(17, 103, 232, 0.25);
-          }
+           }
 
           .brand-title {
             font-weight: 900;
-            font-size: 22px;
+            font-size: 30px;
             color: var(--scopia-blue);
             letter-spacing: 0.2px;
             line-height: 1;
           }
 
           .brand-subtitle {
-            font-size: 12px;
+            font-size: 18px;
             color: var(--scopia-muted);
             margin-top: 4px;
           }
@@ -150,7 +146,7 @@ function LoginPage() {
             background: transparent;
             color: var(--scopia-navy);
             font-weight: 700;
-            font-size: 14px;
+            font-size: 20px;
             cursor: pointer;
             transition: color 0.2s ease;
           }
@@ -163,7 +159,7 @@ function LoginPage() {
             height: calc(100vh - 76px);
             margin-top: 76px;
             display: grid;
-            grid-template-columns: minmax(0, 1fr) 520px;
+            grid-template-columns: minmax(0, 1fr) 720px;
           }
 
           .login-left-scroll {
@@ -318,7 +314,7 @@ function LoginPage() {
             max-width: 780px;
             color: var(--scopia-muted);
             line-height: 1.8;
-            font-size: 16px;
+            font-size: 18px;
             margin-bottom: 28px;
           }
 
@@ -414,19 +410,15 @@ function LoginPage() {
           }
 
           .login-card-logo {
-            width: 64px;
-            height: 64px;
-            border-radius: 22px;
-            background: linear-gradient(135deg, var(--scopia-dark), var(--scopia-blue), var(--scopia-cyan));
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 36px;
-            margin-bottom: 18px;
-            box-shadow: 0 16px 32px rgba(17, 103, 232, 0.28);
-          }
+           width: 80px;
+           height: 80px;
+           border-radius: 22px;
+           object-fit: contain;
+           background: white;
+           padding: 6px;
+           margin-bottom: 18px;
+           box-shadow: 0 16px 32px rgba(17, 103, 232, 0.28);
+           }
 
           .login-card h3 {
             font-weight: 900;
@@ -556,7 +548,11 @@ function LoginPage() {
 
       <nav className="login-navbar">
         <div className="brand-area">
-          <div className="brand-mark">S</div>
+          <img
+          src="/icon1.png"
+          alt="ScopiaCRM Logo"
+          className="brand-mark"
+         />
 
           <div>
             <div className="brand-title">ScopiaCRM</div>
@@ -583,10 +579,10 @@ function LoginPage() {
       <main className="login-main">
         <section className="login-left-scroll">
           <div id="home" className="hero-section fade-section">
-            <div className="hero-badge">Web Tabanlı Kurumsal Yönetim Platformu</div>
+            <div className="hero-badge">Web Tabanlı Yönetim Platformu</div>
 
             <h1 className="hero-title">
-              CRM + <span>İş Takip</span> Sistemi
+              CRM + İş Takip Sistemi
             </h1>
 
             <p className="hero-text">
@@ -723,14 +719,15 @@ function LoginPage() {
 
         <aside className="login-right-fixed">
           <div className="login-card">
-            <div className="login-card-logo">S</div>
+            <img
+            src="/icon1.png"
+            alt="ScopiaCRM Logo"
+            className="login-card-logo"
+           />
 
             <h3>Giriş Yap</h3>
 
-            <p className="login-desc">
-              ScopiaCRM yönetim paneline erişmek için kullanıcı bilgilerinizi
-              giriniz.
-            </p>
+            
 
             <form onSubmit={handleLogin}>
               <div className="mb-3">
@@ -759,9 +756,7 @@ function LoginPage() {
               </button>
             </form>
 
-            <div className="login-note">
-              Güvenli erişim için kullanıcı bilgileriniz sistem tarafından doğrulanır.
-            </div>
+            
           </div>
         </aside>
       </main>

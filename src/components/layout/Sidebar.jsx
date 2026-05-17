@@ -127,7 +127,7 @@ function Sidebar() {
   }}
 >
   <img
-    src="/scopia-logo.png"
+    src="/icon1.png"
     alt="ScopiaCRM Logo"
     style={{
       width: "100px",
